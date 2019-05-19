@@ -8,6 +8,8 @@ import rs.dzoks.timetracker.model.User;
 import rs.dzoks.timetracker.repository.UserRepository;
 import rs.dzoks.timetracker.session.UserBean;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("hub/user")
 @Scope("request")
@@ -37,5 +39,12 @@ public class UserController {
         }
         return getState();
     }
+
+    @GetMapping
+    public List<User> getAll(){
+        return userRepository.getAllByActive((byte)1);
+    }
+
+
 
 }

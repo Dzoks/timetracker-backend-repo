@@ -7,6 +7,7 @@ import java.util.Objects;
 @Table(name = "user_group")
 public class UserGroup {
     private Integer id;
+    private String key;
     private String name;
 
     @Id
@@ -21,7 +22,17 @@ public class UserGroup {
     }
 
     @Basic
-    @Column(name = "name", nullable = true, length = 45)
+    @Column(name = "`key`", nullable = false, length = 45)
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @Basic
+    @Column(name = "name", nullable = false, length = 45)
     public String getName() {
         return name;
     }

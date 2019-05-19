@@ -11,7 +11,7 @@ public class Project {
     private Date startDate;
     private String description;
     private Date estimatedEndDate;
-    private Integer estimateedWorkHours;
+    private Integer estimatedWorkHours;
     private Integer estimatedBudget;
     private Byte finished;
     private Integer projectManagerId;
@@ -69,13 +69,13 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "estimateed_work_hours", nullable = true)
-    public Integer getEstimateedWorkHours() {
-        return estimateedWorkHours;
+    @Column(name = "estimated_work_hours", nullable = true)
+    public Integer getEstimatedWorkHours() {
+        return estimatedWorkHours;
     }
 
-    public void setEstimateedWorkHours(Integer estimateedWorkHours) {
-        this.estimateedWorkHours = estimateedWorkHours;
+    public void setEstimatedWorkHours(Integer estimatedWorkHours) {
+        this.estimatedWorkHours = estimatedWorkHours;
     }
 
     @Basic
@@ -123,20 +123,11 @@ public class Project {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Project project = (Project) o;
-        return Objects.equals(id, project.id) &&
-                Objects.equals(name, project.name) &&
-                Objects.equals(startDate, project.startDate) &&
-                Objects.equals(description, project.description) &&
-                Objects.equals(estimatedEndDate, project.estimatedEndDate) &&
-                Objects.equals(estimateedWorkHours, project.estimateedWorkHours) &&
-                Objects.equals(estimatedBudget, project.estimatedBudget) &&
-                Objects.equals(finished, project.finished) &&
-                Objects.equals(projectManagerId, project.projectManagerId) &&
-                Objects.equals(active, project.active);
+        return Objects.equals(id, project.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, startDate, description, estimatedEndDate, estimateedWorkHours, estimatedBudget, finished, projectManagerId, active);
+        return Objects.hash(id);
     }
 }
