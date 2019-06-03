@@ -3,6 +3,7 @@ package rs.dzoks.timetracker.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
@@ -20,7 +21,12 @@ import java.util.List;
 @RequestMapping("hub/timesheet")
 @Scope("session")
 public class TimesheetController {
-
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public @ResponseBody
+    String handleException(BadRequestException e) {
+        return e.getMessage();
+    }
     private final TimesheetRepository timesheetRepository;
 
     private final UserHasProjectRepository userHasProjectRepository;
@@ -62,7 +68,7 @@ public class TimesheetController {
         timesheet=timesheetRepository.saveAndFlush(timesheet);
         if (timesheet==null)
             throw new BadRequestException("insertFail");
-        String projectName=projectRepository.getProjectByIdAndActive(userHasProject.getId(),(byte)1).getName();
+        String projectName=projectRepository.getProjectByIdAndActive(userHasProject.getProjectId(),(byte)1).getName();
         TimesheetProject tp=new TimesheetProject(timesheet,projectName);
         return tp;
     }

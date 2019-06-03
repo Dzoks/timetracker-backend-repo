@@ -77,6 +77,16 @@ public class ProjectController {
         return puhp;
     }
 
+    @PutMapping("/finish/{projectId}")
+    public Boolean finish(@PathVariable Integer projectId) {
+        Project project=projectRepository.getProjectByIdAndActive(projectId,(byte)1);
+        if (project==null || !project.getProjectManagerId().equals(userBean.getUser().getId()))
+            return false;
+        project.setFinished((byte)1);
+        return projectRepository.saveAndFlush(project)!=null;
+
+    }
+
     @PutMapping
     public Boolean update(@RequestBody Project project){
         project=projectRepository.getProjectByIdAndActive(project.getId(),(byte)1);

@@ -13,6 +13,7 @@ public class UserHasProject {
     private Integer projectId;
     private BigDecimal hourRate;
     private Byte active;
+    private Byte blocked;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -80,5 +81,15 @@ public class UserHasProject {
     @Override
     public int hashCode() {
         return Objects.hash(id, userId, projectId, hourRate, active);
+    }
+
+    @Basic
+    @Column(name = "blocked",insertable = false,nullable = false)
+    public Byte getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Byte blocked) {
+        this.blocked = blocked;
     }
 }

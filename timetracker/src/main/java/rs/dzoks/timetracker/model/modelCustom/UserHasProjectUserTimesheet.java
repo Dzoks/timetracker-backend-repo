@@ -19,7 +19,8 @@ import java.math.BigDecimal;
                         @ColumnResult(name = "last_name"),
                         @ColumnResult(name = "hour_rate"),
                         @ColumnResult(name = "total_hours",type = Integer.class),
-                        @ColumnResult(name = "total_turnover")
+                        @ColumnResult(name = "total_turnover"),
+                        @ColumnResult(name = "blocked")
                 } )
 )
 @MappedSuperclass
@@ -28,11 +29,16 @@ public class UserHasProjectUserTimesheet extends UserHasProject {
     private String lastName;
     private BigDecimal totalTurnover;
     private Integer totalHours;
-    public UserHasProjectUserTimesheet(Integer id,Integer userId,Integer projectId,String firstName,String lastName, BigDecimal hourRate,Integer totalHours,BigDecimal totalTurnover){
+
+    public UserHasProjectUserTimesheet(){
+
+    }
+    public UserHasProjectUserTimesheet(Integer id,Integer userId,Integer projectId,String firstName,String lastName, BigDecimal hourRate,Integer totalHours,BigDecimal totalTurnover,Byte blocked){
         setId(id);
         setUserId(userId);
         setProjectId(projectId);
         setHourRate(hourRate);
+        setBlocked(blocked);
         this.firstName=firstName;
         this.lastName=lastName;
         this.totalHours=totalHours;

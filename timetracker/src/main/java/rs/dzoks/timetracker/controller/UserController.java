@@ -4,7 +4,9 @@ package rs.dzoks.timetracker.controller;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import rs.dzoks.timetracker.common.BadRequestException;
 import rs.dzoks.timetracker.model.User;
 import rs.dzoks.timetracker.repository.UserRepository;
 import rs.dzoks.timetracker.session.UserBean;
@@ -19,7 +21,12 @@ import java.util.List;
 @RequestMapping("hub/user")
 @Scope("request")
 public class UserController {
-
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public @ResponseBody
+    String handleException(BadRequestException e) {
+        return e.getMessage();
+    }
     private final UserRepository userRepository;
 
     private final UserBean userBean;
@@ -63,6 +70,10 @@ public class UserController {
         return userRepository.findById(id).orElse(null);
     }
 
+    @GetMapping("/availableFor/{projectId}")
+    public List<User> getAvailableFor(@PathVariable Integer projectId){
+        return userRepository.getAvailableFor(projectId);
+    }
     private String hashPassword( String plainText)  {
         MessageDigest digest= null;
         try {
