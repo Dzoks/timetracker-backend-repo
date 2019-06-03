@@ -1,20 +1,22 @@
 package rs.dzoks.timetracker.model;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
 @Table(name = "user_has_project")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UserHasProject {
     private Integer id;
     private Integer userId;
     private Integer projectId;
-    private Integer hourRate;
+    private BigDecimal hourRate;
     private Byte active;
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -45,16 +47,16 @@ public class UserHasProject {
 
     @Basic
     @Column(name = "hour_rate", nullable = false, precision = 0)
-    public Integer getHourRate() {
+    public BigDecimal getHourRate() {
         return hourRate;
     }
 
-    public void setHourRate(Integer hourRate) {
+    public void setHourRate(BigDecimal hourRate) {
         this.hourRate = hourRate;
     }
 
     @Basic
-    @Column(name = "active", nullable = false)
+    @Column(name = "active", nullable = false,insertable = false)
     public Byte getActive() {
         return active;
     }

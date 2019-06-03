@@ -1,10 +1,14 @@
 package rs.dzoks.timetracker.model;
 
+import com.rits.cloning.Cloner;
+
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Project {
     private Integer id;
     private String name;
@@ -12,14 +16,24 @@ public class Project {
     private String description;
     private Date estimatedEndDate;
     private Integer estimatedWorkHours;
-    private Integer estimatedBudget;
+    private BigDecimal estimatedBudget;
     private Byte finished;
     private Integer projectManagerId;
     private Byte active;
 
+    @Transient
+    private BigDecimal hourRate;
+    @Transient
+    public BigDecimal getHourRate() {
+        return hourRate;
+    }
+    public void setHourRate(BigDecimal hourRate) {
+        this.hourRate = hourRate;
+    }
+
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -80,16 +94,16 @@ public class Project {
 
     @Basic
     @Column(name = "estimated_budget", nullable = true, precision = 0)
-    public Integer getEstimatedBudget() {
+    public BigDecimal getEstimatedBudget() {
         return estimatedBudget;
     }
 
-    public void setEstimatedBudget(Integer estimatedBudget) {
+    public void setEstimatedBudget(BigDecimal estimatedBudget) {
         this.estimatedBudget = estimatedBudget;
     }
 
     @Basic
-    @Column(name = "finished", nullable = false)
+    @Column(name = "finished", nullable = false,insertable = false)
     public Byte getFinished() {
         return finished;
     }
@@ -109,7 +123,7 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "active", nullable = false)
+    @Column(name = "active", nullable = false,insertable = false)
     public Byte getActive() {
         return active;
     }
@@ -130,4 +144,21 @@ public class Project {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public Project(){
+
+    }
+    public Project(Integer id, String name, Date startDate, String description, Date estimatedEndDate, Integer estimatedWorkHours, BigDecimal estimatedBudget, Byte finished, Integer projectManagerId, Byte active) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.description = description;
+        this.estimatedEndDate = estimatedEndDate;
+        this.estimatedWorkHours = estimatedWorkHours;
+        this.estimatedBudget = estimatedBudget;
+        this.finished = finished;
+        this.projectManagerId = projectManagerId;
+        this.active = active;
+    }
+
 }

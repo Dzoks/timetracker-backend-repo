@@ -1,24 +1,27 @@
 package rs.dzoks.timetracker.model;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+
 public class Timesheet {
     private Integer id;
-    private Date date;
+    private Timestamp date;
     private String description;
     private Integer hours;
-    private Integer turnover;
+    private BigDecimal turnover;
     private Timestamp created;
     private Integer userHasProjectId;
     private Byte active;
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -29,11 +32,11 @@ public class Timesheet {
 
     @Basic
     @Column(name = "date", nullable = false)
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 
@@ -59,11 +62,11 @@ public class Timesheet {
 
     @Basic
     @Column(name = "turnover", nullable = false, precision = 0)
-    public Integer getTurnover() {
+    public BigDecimal getTurnover() {
         return turnover;
     }
 
-    public void setTurnover(Integer turnover) {
+    public void setTurnover(BigDecimal turnover) {
         this.turnover = turnover;
     }
 
@@ -88,12 +91,26 @@ public class Timesheet {
     }
 
     @Basic
-    @Column(name = "active", nullable = false)
+    @Column(name = "active", nullable = false,insertable = false)
     public Byte getActive() {
         return active;
     }
 
     public void setActive(Byte active) {
+        this.active = active;
+    }
+
+    public Timesheet(){
+
+    }
+    public Timesheet(Integer id, Timestamp date, String description, Integer hours, BigDecimal turnover, Timestamp created, Integer userHasProjectId, Byte active) {
+        this.id = id;
+        this.date = date;
+        this.description = description;
+        this.hours = hours;
+        this.turnover = turnover;
+        this.created = created;
+        this.userHasProjectId = userHasProjectId;
         this.active = active;
     }
 
@@ -115,5 +132,9 @@ public class Timesheet {
     @Override
     public int hashCode() {
         return Objects.hash(id, date, description, hours, turnover, created, userHasProjectId, active);
+    }
+
+    public Timesheet cloneMe(){
+        return this;
     }
 }

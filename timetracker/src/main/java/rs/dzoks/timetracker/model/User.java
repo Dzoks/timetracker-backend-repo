@@ -1,9 +1,12 @@
 package rs.dzoks.timetracker.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     private Integer id;
     private String email;
@@ -15,7 +18,7 @@ public class User {
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -36,6 +39,7 @@ public class User {
 
     @Basic
     @Column(name = "password", nullable = false, length = 45)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
@@ -75,7 +79,7 @@ public class User {
     }
 
     @Basic
-    @Column(name = "active", nullable = false)
+    @Column(name = "active", nullable = false,insertable = false)
     public Byte getActive() {
         return active;
     }
@@ -96,6 +100,19 @@ public class User {
                 Objects.equals(lastName, user.lastName) &&
                 Objects.equals(userGroupId, user.userGroupId) &&
                 Objects.equals(active, user.active);
+    }
+
+    public User(){}
+
+
+    public User(Integer id, String email, String password, String firstName, String lastName, Integer userGroupId, Byte active) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userGroupId = userGroupId;
+        this.active = active;
     }
 
     @Override
