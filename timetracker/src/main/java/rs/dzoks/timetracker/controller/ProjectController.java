@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
+import rs.dzoks.timetracker.common.ForbiddenException;
 import rs.dzoks.timetracker.common.UserGroupMap;
 import rs.dzoks.timetracker.model.Project;
 import rs.dzoks.timetracker.model.UserGroup;
@@ -18,6 +19,7 @@ import rs.dzoks.timetracker.session.UserBean;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +34,12 @@ public class ProjectController {
     String handleException(BadRequestException e) {
         return e.getMessage();
     }
-
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public @ResponseBody
+    String handleException(ForbiddenException e) {
+        return e.getMessage();
+    }
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -54,13 +61,17 @@ public class ProjectController {
 
     @GetMapping
     public List<ProjectUserHasProject> getAll(){
+        if (userGroupMap.getByKey("projectManager").equals(userBean.getUser().getUserGroupId()))
+            return projectRepository.getProjectsForProjectManager(userBean.getUser().getId());
         return projectRepository.getProjectsForUser(userBean.getUser().getId());
     }
 
 
     @PostMapping
     @Transactional(rollbackFor = Exception.class)
-    public ProjectUserHasProject insert(@RequestBody Project project) throws BadRequestException {
+    public ProjectUserHasProject insert(@RequestBody Project project) throws BadRequestException, ForbiddenException {
+        if (!userBean.getUser().getUserGroupId().equals(userGroupMap.getByKey("projectManager")))
+            throw new ForbiddenException("Unauthorized");
         project.setProjectManagerId(userBean.getUser().getId());
         project=projectRepository.saveAndFlush(project);
         if (project==null)
@@ -73,6 +84,8 @@ public class ProjectController {
         if (uhp==null)
             throw new BadRequestException("insertFail");
         ProjectUserHasProject puhp=new ProjectUserHasProject(project,uhp.getId());
+        puhp.setTotalHours(0);
+        puhp.setTotalAmount(BigDecimal.ZERO);
        // entityManager.refresh(project);
         return puhp;
     }
@@ -89,8 +102,9 @@ public class ProjectController {
 
     @PutMapping
     public Boolean update(@RequestBody Project project){
-        project=projectRepository.getProjectByIdAndActive(project.getId(),(byte)1);
-        if (project==null || !project.getProjectManagerId().equals(userBean.getUser().getId()))
+
+        Project projectDb=projectRepository.getProjectByIdAndActive(project.getId(),(byte)1);
+        if (projectDb==null || !projectDb.getProjectManagerId().equals(userBean.getUser().getId()))
             return false;
         return projectRepository.saveAndFlush(project)!=null;
 
@@ -99,10 +113,12 @@ public class ProjectController {
     @DeleteMapping("/{projectId}")
     public Boolean deleteProject(@PathVariable Integer projectId){
         Project project=projectRepository.getProjectByIdAndActive(projectId,(byte)1);
-        if (project==null)
+        if (project==null || !project.getProjectManagerId().equals(userBean.getUser().getId()))
             return false;
         project.setActive((byte)0);
         return projectRepository.saveAndFlush(project)!=null;
     }
+
+
 
 }

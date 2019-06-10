@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ProjectRepositoryCustom {
     List<ProjectUserHasProject> getProjectsForUser(Integer userId);
+
+    List<ProjectUserHasProject> getProjectsForProjectManager(Integer userId);
 }

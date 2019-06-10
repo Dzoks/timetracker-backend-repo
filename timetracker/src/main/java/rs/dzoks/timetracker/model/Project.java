@@ -14,9 +14,6 @@ public class Project {
     private String name;
     private Date startDate;
     private String description;
-    private Date estimatedEndDate;
-    private Integer estimatedWorkHours;
-    private BigDecimal estimatedBudget;
     private Byte finished;
     private Integer projectManagerId;
     private Byte active;
@@ -73,36 +70,6 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "estimated_end_date", nullable = true)
-    public Date getEstimatedEndDate() {
-        return estimatedEndDate;
-    }
-
-    public void setEstimatedEndDate(Date estimatedEndDate) {
-        this.estimatedEndDate = estimatedEndDate;
-    }
-
-    @Basic
-    @Column(name = "estimated_work_hours", nullable = true)
-    public Integer getEstimatedWorkHours() {
-        return estimatedWorkHours;
-    }
-
-    public void setEstimatedWorkHours(Integer estimatedWorkHours) {
-        this.estimatedWorkHours = estimatedWorkHours;
-    }
-
-    @Basic
-    @Column(name = "estimated_budget", nullable = true, precision = 0)
-    public BigDecimal getEstimatedBudget() {
-        return estimatedBudget;
-    }
-
-    public void setEstimatedBudget(BigDecimal estimatedBudget) {
-        this.estimatedBudget = estimatedBudget;
-    }
-
-    @Basic
     @Column(name = "finished", nullable = false,insertable = false)
     public Byte getFinished() {
         return finished;
@@ -148,14 +115,11 @@ public class Project {
     public Project(){
 
     }
-    public Project(Integer id, String name, Date startDate, String description, Date estimatedEndDate, Integer estimatedWorkHours, BigDecimal estimatedBudget, Byte finished, Integer projectManagerId, Byte active) {
+    public Project(Integer id, String name, Date startDate, String description, Byte finished, Integer projectManagerId, Byte active) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.description = description;
-        this.estimatedEndDate = estimatedEndDate;
-        this.estimatedWorkHours = estimatedWorkHours;
-        this.estimatedBudget = estimatedBudget;
         this.finished = finished;
         this.projectManagerId = projectManagerId;
         this.active = active;

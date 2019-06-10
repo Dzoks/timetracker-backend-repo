@@ -11,4 +11,6 @@ public interface ProjectRepository extends JpaRepository<Project,Integer>, Proje
 
     List<Project> getAllByProjectManagerIdAndActive(Integer projectManagerId,Byte active);
     Project getProjectByIdAndActive(Integer id, Byte active);
+
+    Boolean existsByProjectManagerIdAndFinishedAndActive(Integer projectManagerId,Byte finished,Byte active);
 }

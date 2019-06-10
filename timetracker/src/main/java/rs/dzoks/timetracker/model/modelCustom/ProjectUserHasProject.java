@@ -14,26 +14,29 @@ import java.sql.Date;
         @ColumnResult(name = "name"),
         @ColumnResult(name = "start_date", type = java.util.Date.class),
         @ColumnResult(name = "description"),
-        @ColumnResult(name = "estimated_end_date", type = java.util.Date.class),
-        @ColumnResult(name = "estimated_work_hours"),
-        @ColumnResult(name = "estimated_budget"),
         @ColumnResult(name = "finished"),
         @ColumnResult(name = "project_manager_id"),
         @ColumnResult(name = "active"),
-        @ColumnResult(name = "user_has_project_id")
+        @ColumnResult(name = "user_has_project_id"),
+        @ColumnResult(name = "total_hours",type = Integer.class),
+        @ColumnResult(name = "total_amount",type = BigDecimal.class)
 }))
 
 @MappedSuperclass
 public class ProjectUserHasProject extends Project {
     private Integer userHasProjectId;
+    private Integer totalHours;
+    private BigDecimal totalAmount;
 
-    public ProjectUserHasProject(Integer id, String name, java.util.Date startDate, String description, java.util.Date estimatedEndDate, Integer estimatedWorkHours, BigDecimal estimatedBudget, Byte finished, Integer projectManagerId, Byte active, Integer userHasProjectId) {
-        super(id, name, startDate == null ? null : new Date(startDate.getTime()), description, estimatedEndDate == null ? null : new Date(estimatedEndDate.getTime()), estimatedWorkHours, estimatedBudget, finished, projectManagerId, active);
+    public ProjectUserHasProject(Integer id, String name, java.util.Date startDate, String description, Byte finished, Integer projectManagerId, Byte active, Integer userHasProjectId,Integer totalHours,BigDecimal totalAmount) {
+        super(id, name, startDate == null ? null : new Date(startDate.getTime()), description, finished, projectManagerId, active);
         this.userHasProjectId = userHasProjectId;
+        this.totalAmount=totalAmount;
+        this.totalHours=totalHours;
     }
 
     public ProjectUserHasProject(Project project, Integer userHasProjectId) {
-        super(project.getId(), project.getName(), project.getStartDate(), project.getDescription(), project.getEstimatedEndDate(), project.getEstimatedWorkHours(), project.getEstimatedBudget(), project.getFinished(), project.getProjectManagerId(), project.getActive());
+        super(project.getId(), project.getName(), project.getStartDate(), project.getDescription(), project.getFinished(), project.getProjectManagerId(), project.getActive());
         this.userHasProjectId=userHasProjectId;
     }
 
@@ -45,5 +48,19 @@ public class ProjectUserHasProject extends Project {
         this.userHasProjectId = userHasProjectId;
     }
 
+    public Integer getTotalHours() {
+        return totalHours;
+    }
 
+    public void setTotalHours(Integer totalHours) {
+        this.totalHours = totalHours;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 }

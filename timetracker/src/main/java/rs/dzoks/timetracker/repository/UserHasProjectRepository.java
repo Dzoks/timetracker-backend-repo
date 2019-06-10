@@ -5,4 +5,6 @@ import rs.dzoks.timetracker.model.UserHasProject;
 import rs.dzoks.timetracker.repository.repositoryCustom.UserHasProjectRepositoryCustom;
 
 public interface UserHasProjectRepository extends JpaRepository<UserHasProject,Integer>, UserHasProjectRepositoryCustom {
+    UserHasProject getUserHasProjectByIdAndActive(Integer id,Byte active);
+
 }
