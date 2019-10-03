@@ -15,6 +15,9 @@ public class Project {
     private Date startDate;
     private String description;
     private Byte finished;
+    private Date estimatedEndDate;
+    private Date endDate;
+    private BigDecimal budget;
     private Integer projectManagerId;
     private Byte active;
 
@@ -77,6 +80,36 @@ public class Project {
 
     public void setFinished(Byte finished) {
         this.finished = finished;
+    }
+
+    @Basic
+    @Column(name = "estimated_end_date")
+    public Date getEstimatedEndDate() {
+        return estimatedEndDate;
+    }
+
+    public void setEstimatedEndDate(Date estimatedEndDate) {
+        this.estimatedEndDate = estimatedEndDate;
+    }
+
+    @Basic
+    @Column(name = "end_date")
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    @Basic
+    @Column(name = "budget")
+    public BigDecimal getBudget() {
+        return budget;
+    }
+
+    public void setBudget(BigDecimal budget) {
+        this.budget = budget;
     }
 
     @Basic

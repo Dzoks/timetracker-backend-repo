@@ -23,23 +23,26 @@ CREATE TABLE IF NOT EXISTS `project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `start_date` date NOT NULL,
-  `description` varchar(128) DEFAULT NULL,
+  `description` varchar(8192) DEFAULT NULL,
   `finished` tinyint(4) NOT NULL DEFAULT '0',
   `project_manager_id` int(11) NOT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  `estimated_end_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `budget` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_project_user1_idx` (`project_manager_id`),
   CONSTRAINT `fk_project_user1` FOREIGN KEY (`project_manager_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table timetracker_db.project: ~4 rows (approximately)
 DELETE FROM `project`;
 /*!40000 ALTER TABLE `project` DISABLE KEYS */;
-INSERT INTO `project` (`id`, `name`, `start_date`, `description`, `finished`, `project_manager_id`, `active`) VALUES
-	(16, 'Timetracker', '2019-04-01', 'Softver za praćenje i evidenciju vremena provedenog na projektu', 1, 5, 1),
-	(17, 'Softver za prepoznavanje lica', '2019-09-01', 'Izrada softvera za prepoznavanje lica na osnovu video snimaka', 0, 8, 1),
-	(18, 'React edukacija', '2019-08-04', 'Predavanja vezana za React biblioteku', 0, 8, 1),
-	(19, 'Amazon Integracija', '2019-09-06', 'Integracija postojećih aplikacija sa Amazon Web servisima', 0, 5, 1);
+INSERT INTO `project` (`id`, `name`, `start_date`, `description`, `finished`, `project_manager_id`, `active`, `estimated_end_date`, `end_date`, `budget`) VALUES
+	(16, 'Timetracker', '2019-04-01', 'Softver za praćenje i evidenciju vremena provedenog na projektu', 1, 5, 1, '2019-05-17', '2019-04-23', 2000.00),
+	(17, 'Softver za prepoznavanje lica', '2019-09-01', 'Izrada softvera za prepoznavanje lica na osnovu video snimaka', 0, 8, 1, '2019-12-17', NULL, 25000.00),
+	(18, 'React edukacija', '2019-08-04', 'Predavanja vezana za React biblioteku', 0, 8, 1, NULL, NULL, 3500.00),
+	(19, 'Amazon Integracija', '2019-09-06', 'Integracija postojećih aplikacija sa Amazon Web servisima', 0, 5, 1, '2019-10-31', NULL, 4200.00);
 /*!40000 ALTER TABLE `project` ENABLE KEYS */;
 
 -- Dumping structure for table timetracker_db.timesheet
@@ -208,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `user_has_project` (
   KEY `fk_user_has_project_user1_idx` (`user_id`),
   CONSTRAINT `fk_user_has_project_project1` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_project_user1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table timetracker_db.user_has_project: ~13 rows (approximately)
 DELETE FROM `user_has_project`;

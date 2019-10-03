@@ -20,6 +20,8 @@ import rs.dzoks.timetracker.session.UserBean;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,6 +98,7 @@ public class ProjectController {
         if (project==null || !project.getProjectManagerId().equals(userBean.getUser().getId()))
             return false;
         project.setFinished((byte)1);
+        project.setEndDate(Date.valueOf(LocalDate.now()));
         return projectRepository.saveAndFlush(project)!=null;
 
     }
