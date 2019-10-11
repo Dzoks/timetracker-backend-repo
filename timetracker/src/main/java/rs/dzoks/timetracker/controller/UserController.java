@@ -6,11 +6,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
 import rs.dzoks.timetracker.common.ForbiddenException;
+import rs.dzoks.timetracker.common.GenericController;
 import rs.dzoks.timetracker.common.UserGroupMap;
 import rs.dzoks.timetracker.model.User;
 import rs.dzoks.timetracker.model.modelOther.ChangePasswordModel;
@@ -29,39 +29,23 @@ import java.util.List;
 @RestController
 @RequestMapping("hub/user")
 @Scope("request")
-public class UserController {
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    String handleException(BadRequestException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public @ResponseBody
-    String handleException(ForbiddenException e) {
-        return e.getMessage();
-    }
+public class UserController extends GenericController {
 
     private final UserRepository userRepository;
-
-
-    private final UserGroupMap userGroupMap;
-    private final UserBean userBean;
 
     private final ProjectRepository projectRepository;
 
     private final Notification notification;
 
     @Autowired
-    public UserController(UserRepository userRepository, UserBean userBean, Notification notification, ProjectRepository projectRepository, UserGroupMap userGroupMap) {
+    public UserController(UserBean userBean, UserGroupMap userGroupMap, UserRepository userRepository, ProjectRepository projectRepository, Notification notification) {
+        super(userBean, userGroupMap);
         this.userRepository = userRepository;
-        this.userBean = userBean;
-        this.notification = notification;
         this.projectRepository = projectRepository;
-        this.userGroupMap = userGroupMap;
+        this.notification = notification;
     }
+
+
 
     @GetMapping("/state")
     public UserBean getState() {

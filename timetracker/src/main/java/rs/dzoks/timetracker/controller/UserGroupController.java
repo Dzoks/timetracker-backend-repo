@@ -15,12 +15,7 @@ import java.util.List;
 @Scope("session")
 public class UserGroupController {
 
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public @ResponseBody
-    String handleException(ForbiddenException e) {
-        return e.getMessage();
-    }
+
 
     private final UserGroupRepository userGroupRepository;
 

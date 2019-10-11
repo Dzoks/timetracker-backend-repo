@@ -3,11 +3,11 @@ package rs.dzoks.timetracker.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
 import rs.dzoks.timetracker.common.ForbiddenException;
+import rs.dzoks.timetracker.common.GenericController;
 import rs.dzoks.timetracker.common.UserGroupMap;
 import rs.dzoks.timetracker.model.Timesheet;
 import rs.dzoks.timetracker.model.UserHasProject;
@@ -23,37 +23,22 @@ import java.util.List;
 @RestController
 @RequestMapping("hub/timesheet")
 @Scope("session")
-public class TimesheetController {
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    String handleException(BadRequestException e) {
-        return e.getMessage();
-    }
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public @ResponseBody
-    String handleException(ForbiddenException e) {
-        return e.getMessage();
-    }
+public class TimesheetController extends GenericController {
+
     private final TimesheetRepository timesheetRepository;
 
     private final UserHasProjectRepository userHasProjectRepository;
 
     private final ProjectRepository projectRepository;
 
-    private final UserBean userBean;
-
-    private final UserGroupMap userGroupMap;
-
-
-    public TimesheetController(TimesheetRepository timesheetRepository, UserHasProjectRepository userHasProjectRepository, ProjectRepository projectRepository, UserBean userBean, UserGroupMap userGroupMap) {
+    @Autowired
+    public TimesheetController(UserBean userBean, UserGroupMap userGroupMap, TimesheetRepository timesheetRepository, UserHasProjectRepository userHasProjectRepository, ProjectRepository projectRepository) {
+        super(userBean, userGroupMap);
         this.timesheetRepository = timesheetRepository;
         this.userHasProjectRepository = userHasProjectRepository;
         this.projectRepository = projectRepository;
-        this.userBean = userBean;
-        this.userGroupMap = userGroupMap;
     }
+
 
     @GetMapping("/byUser/{userId}")
     public List<TimesheetProject> getByUser(@PathVariable Integer userId) throws ForbiddenException {

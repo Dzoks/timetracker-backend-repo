@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
 import rs.dzoks.timetracker.common.ForbiddenException;
+import rs.dzoks.timetracker.common.GenericController;
 import rs.dzoks.timetracker.common.UserGroupMap;
 import rs.dzoks.timetracker.model.Project;
 import rs.dzoks.timetracker.model.UserGroup;
@@ -28,36 +29,17 @@ import java.util.List;
 @RestController
 @RequestMapping("hub/project")
 @Scope("session")
-public class ProjectController {
-
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    String handleException(BadRequestException e) {
-        return e.getMessage();
-    }
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public @ResponseBody
-    String handleException(ForbiddenException e) {
-        return e.getMessage();
-    }
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    private final UserBean userBean;
+public class ProjectController extends GenericController {
 
     private final ProjectRepository projectRepository;
 
     private final UserHasProjectRepository userHasProjectRepository;
 
-    private final UserGroupMap userGroupMap;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository, UserBean userBean, UserGroupMap userGroupMap, UserHasProjectRepository userHasProjectRepository) {
+        super(userBean,userGroupMap);
         this.projectRepository = projectRepository;
-        this.userBean = userBean;
-        this.userGroupMap = userGroupMap;
         this.userHasProjectRepository = userHasProjectRepository;
     }
 
@@ -100,7 +82,6 @@ public class ProjectController {
         project.setFinished((byte)1);
         project.setEndDate(Date.valueOf(LocalDate.now()));
         return projectRepository.saveAndFlush(project)!=null;
-
     }
 
     @PutMapping

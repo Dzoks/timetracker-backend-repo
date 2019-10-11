@@ -1,12 +1,12 @@
 package rs.dzoks.timetracker.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.dzoks.timetracker.common.BadRequestException;
 import rs.dzoks.timetracker.common.ForbiddenException;
+import rs.dzoks.timetracker.common.GenericController;
+import rs.dzoks.timetracker.common.UserGroupMap;
 import rs.dzoks.timetracker.model.Project;
 import rs.dzoks.timetracker.model.User;
 import rs.dzoks.timetracker.model.UserHasProject;
@@ -17,40 +17,29 @@ import rs.dzoks.timetracker.repository.UserHasProjectRepository;
 import rs.dzoks.timetracker.repository.UserRepository;
 import rs.dzoks.timetracker.session.UserBean;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("hub/userHasProject")
 @Scope("session")
-public class UserHasProjectController {
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    String handleException(BadRequestException e) {
-        return e.getMessage();
-    }
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public @ResponseBody
-    String handleException(ForbiddenException e) {
-        return e.getMessage();
-    }
+public class UserHasProjectController extends GenericController {
+
     private final UserHasProjectRepository userHasProjectRepository;
 
     private final TimesheetRepository timesheetRepository;
 
     private final UserRepository userRepository;
-    private final UserBean userBean;
+
     private final ProjectRepository projectRepository;
 
-    @Autowired
-    public UserHasProjectController(UserHasProjectRepository userHasProjectRepository, TimesheetRepository timesheetRepository, UserRepository userRepository, ProjectRepository projectRepository, UserBean userBean) {
+
+
+    public UserHasProjectController(UserBean userBean, UserGroupMap userGroupMap, UserHasProjectRepository userHasProjectRepository, TimesheetRepository timesheetRepository, UserRepository userRepository, ProjectRepository projectRepository) {
+        super(userBean, userGroupMap);
         this.userHasProjectRepository = userHasProjectRepository;
         this.timesheetRepository = timesheetRepository;
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
-        this.userBean = userBean;
     }
 
     @GetMapping("/{projectId}")

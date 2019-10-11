@@ -1,14 +1,30 @@
 package rs.dzoks.timetracker.model;
 
+import rs.dzoks.timetracker.model.modelCustom.TimesheetProject;
+import rs.dzoks.timetracker.model.modelOther.LineChartModel;
+import rs.dzoks.timetracker.model.modelOther.PieChartModel;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-
+@SqlResultSetMapping(name = "PieChartMapping",
+        classes = @ConstructorResult(targetClass = PieChartModel.class,
+                columns = {
+                        @ColumnResult(name = "id"),
+                        @ColumnResult(name = "text"),
+                        @ColumnResult(name = "value",type = BigDecimal.class),
+                }))
+@SqlResultSetMapping(name = "LineChartMapping",
+        classes = @ConstructorResult(targetClass = LineChartModel.class,
+                columns = {
+                        @ColumnResult(name = "date",type = Date.class),
+                        @ColumnResult(name = "value",type = BigDecimal.class),
+                }))
 public class Timesheet {
     private Integer id;
     private Timestamp date;
