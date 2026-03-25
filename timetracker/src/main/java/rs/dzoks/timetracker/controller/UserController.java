@@ -1,7 +1,6 @@
 package rs.dzoks.timetracker.controller;
 
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -19,10 +18,13 @@ import rs.dzoks.timetracker.repository.UserRepository;
 import rs.dzoks.timetracker.session.UserBean;
 import rs.dzoks.timetracker.util.Notification;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +38,11 @@ public class UserController extends GenericController {
     private final ProjectRepository projectRepository;
 
     private final Notification notification;
+
+    private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512";
+    private static final int PBKDF2_ITERATIONS = 210000; // FIPS guidance: >= 210k for SHA-512
+    private static final int SALT_LENGTH_BYTES = 32; // 256-bit salt
+    private static final int DERIVED_KEY_LENGTH_BITS = 512; // 512-bit output
 
     @Autowired
     public UserController(UserBean userBean, UserGroupMap userGroupMap, UserRepository userRepository, ProjectRepository projectRepository, Notification notification) {
@@ -54,8 +61,8 @@ public class UserController extends GenericController {
 
     @PostMapping("/login")
     public UserBean login(@RequestBody User loginInfo) {
-        User user = userRepository.getUserByEmailAndPasswordAndActive(loginInfo.getEmail(), hashPassword(loginInfo.getPassword()), (byte) 1);
-        if (user != null) {
+        User user = userRepository.getUserByEmailAndActive(loginInfo.getEmail(), (byte) 1);
+        if (user != null && verifyPassword(loginInfo.getPassword(), user.getPassword())) {
             userBean.setAuthorized(true);
             userBean.setUser(user);
         }
@@ -64,8 +71,10 @@ public class UserController extends GenericController {
 
     @PutMapping("/changePassword")
     public boolean changePassword(@RequestBody ChangePasswordModel changePasswordModel) {
-        User user = userRepository.getUserByIdAndPasswordAndActive(changePasswordModel.getId(), hashPassword(changePasswordModel.getOldPassword()), (byte) 1);
+        User user = userRepository.getUserByIdAndActive(changePasswordModel.getId(), (byte) 1);
         if (user == null || !user.getId().equals(userBean.getUser().getId()))
+            return false;
+        if (!verifyPassword(changePasswordModel.getOldPassword(), user.getPassword()))
             return false;
         user.setPassword(hashPassword(changePasswordModel.getNewPassword()));
         return userRepository.saveAndFlush(user) != null;
@@ -98,15 +107,50 @@ public class UserController extends GenericController {
     }
 
     private String hashPassword(String plainText) {
-        MessageDigest digest = null;
         try {
-            digest = MessageDigest.getInstance("SHA-512");
-            return Hex.encodeHexString(digest.digest(plainText.getBytes()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+            byte[] salt = new byte[SALT_LENGTH_BYTES];
+            SecureRandom.getInstanceStrong().nextBytes(salt);
+            SecretKeyFactory skf = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
+            PBEKeySpec spec = new PBEKeySpec(plainText.toCharArray(), salt, PBKDF2_ITERATIONS, DERIVED_KEY_LENGTH_BITS);
+            byte[] derived = skf.generateSecret(spec).getEncoded();
+            String saltB64 = Base64.getEncoder().encodeToString(salt);
+            String hashB64 = Base64.getEncoder().encodeToString(derived);
+            return "$pbkdf2-sha512$" + PBKDF2_ITERATIONS + "$" + saltB64 + "$" + hashB64;
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Password hashing failed", e);
         }
+    }
 
+    private boolean verifyPassword(String password, String storedHash) {
+        if (storedHash == null || !storedHash.startsWith("$pbkdf2-sha512$")) {
+            System.err.println("CRYPTO_MIGRATION: Legacy or invalid password hash format detected - rejecting.");
+            return false;
+        }
+        String[] parts = storedHash.split("\\$");
+        if (parts.length != 5) {
+            return false;
+        }
+        try {
+            int iterations = Integer.parseInt(parts[2]);
+            byte[] salt = Base64.getDecoder().decode(parts[3]);
+            byte[] expected = Base64.getDecoder().decode(parts[4]);
+            SecretKeyFactory skf = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, expected.length * 8);
+            byte[] actual = skf.generateSecret(spec).getEncoded();
+            return constantTimeEquals(actual, expected);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean constantTimeEquals(byte[] a, byte[] b) {
+        if (a == null || b == null) return false;
+        if (a.length != b.length) return false;
+        int result = 0;
+        for (int i = 0; i < a.length; i++) {
+            result |= a[i] ^ b[i];
+        }
+        return result == 0;
     }
 
     @DeleteMapping("/{userId}")
